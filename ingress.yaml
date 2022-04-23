@@ -5,7 +5,7 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    external-dns.alpha.kubernetes.io/hostname: produce-service.avinashupadhyaya.live
+    external-dns.alpha.kubernetes.io/hostname: produce-service.avinashupadhyaya.live, package-service.avinashupadhyaya.live
     certmanager.k8s.io/cluster-issuer: letsencrypt-cluster-issuer
     acme.cert-manager.io/http01-edit-in-place: "true"
     # cert-manager.io/issue-temporary-certificate: "true"
@@ -31,5 +31,15 @@ spec:
           backend:
             service:
               name: service-produce
+              port:
+                number: 8080
+    - host: package-service.avinashupadhyaya.live
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-package
               port:
                 number: 8080
