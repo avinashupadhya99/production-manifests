@@ -82,3 +82,23 @@ k apply -f external-dns.yaml
 ```bash
 k apply -f ingress.yaml
 ```
+
+### Logging
+
+https://aws.amazon.com/blogs/containers/fluent-bit-for-amazon-eks-on-aws-fargate-is-here/
+
+```bash
+k apply -f fluentbit-config.yaml
+```
+
+```bash
+aws iam create-policy \
+        --policy-name FluentBitEKSFargate \
+        --policy-document file://permissions.json 
+```
+
+```
+aws iam attach-role-policy \
+        --policy-arn arn:aws:iam::$ACCOUNT_ID:policy/FluentBitEKSFargate \
+        --role-name AmazonEKSFargatePodExecutionRole
+```
