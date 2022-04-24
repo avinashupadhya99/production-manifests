@@ -3,9 +3,10 @@ kind: Deployment
 metadata:
   name:  produce-service
   labels:
-    name:  produce-service
     component: production
-    env: dev
+    tags.datadoghq.com/service: produce-service
+    tags.datadoghq.com/env: dev
+    tags.datadoghq.com/version: "0.1.0"
 spec:
   replicas: 2
   selector:
@@ -21,7 +22,9 @@ spec:
       labels:
         app.kubernetes.io/name: produce-service
         component: production
-        env: dev
+        tags.datadoghq.com/service: produce-service
+        tags.datadoghq.com/env: dev
+        tags.datadoghq.com/version: "0.1.0"
     spec:
       containers:
       - image: avinashupadhya99/produce-service:0.1.0
@@ -35,7 +38,7 @@ spec:
           httpGet:
             path: /_status/healthz
             port: 8080
-          initialDelaySeconds: 90
+          initialDelaySeconds: 240
           timeoutSeconds: 10
         readinessProbe:
           httpGet:
@@ -74,7 +77,61 @@ spec:
               name: production-database
               key: password
               optional: false
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: DD_LOGS_INJECTION
+          value: "true"
         ports:
         - containerPort:  8080
           name:  spring-boot
+      - image: datadog/agent:7.33.0
+        name: datadog-agent
+        ports:
+          - containerPort: 8125
+            name: dogstatsdport
+            protocol: UDP
+          - containerPort: 8126
+            name: traceport
+            protocol: TCP
+        env:
+        - name: DD_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: datadog
+              key: api-key
+              optional: false
+        - name: DD_SITE
+          value: "datadoghq.com"
+        - name: DD_EKS_FARGATE
+          value: "true"
+        - name: DD_APM_ENABLED
+          value: "true"
+        - name: DD_CLUSTER_NAME
+          value: "commission-cluster"
+        - name: DD_KUBERNETES_KUBELET_NODENAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
       restartPolicy: Always
