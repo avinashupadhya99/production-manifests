@@ -16,5 +16,5 @@ data:
         Name cloudwatch_logs
         Match   *
         region ap-south-1
-        log_group_name production-cloudwatch
-        log_stream_prefix production-component-
+        log_group_name manufacturing-cloudwatch
+        log_stream_prefix manufacturing-component-

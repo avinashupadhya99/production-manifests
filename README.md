@@ -1,4 +1,4 @@
-# Manifests for deploying `Production` application on EKS
+# Manifests for deploying `manufacturing` application on EKS
 
 ```bash
 eksctl create cluster -f eks-cluster-config.yaml
@@ -26,7 +26,7 @@ k apply -f package-service/service.yaml
 https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 
 ```bash
-aws eks describe-cluster --name production-cluster --query "cluster.identity.oidc.issuer" --output text
+aws eks describe-cluster --name manufacturing-cluster --query "cluster.identity.oidc.issuer" --output text
 ```
 
 ```bash
@@ -34,7 +34,7 @@ aws iam list-open-id-connect-providers | grep XXXXXXXXXXXXXXXXXXXXX
 ```
 
 ```bash
-eksctl utils associate-iam-oidc-provider --cluster production-cluster --approve
+eksctl utils associate-iam-oidc-provider --cluster manufacturing-cluster --approve
 ```
 
 
@@ -46,10 +46,10 @@ aws iam create-policy \
 
 ```bash
 eksctl create iamserviceaccount \
-  --cluster=production-cluster \
+  --cluster=manufacturing-cluster \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
-  --role-name "AmazonEKSProductionLoadBalancerControllerRole" \
+  --role-name "AmazonEKSmanufacturingLoadBalancerControllerRole" \
   --attach-policy-arn=arn:aws:iam::$ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
 ```
@@ -57,7 +57,7 @@ eksctl create iamserviceaccount \
 ```bash
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   -n kube-system \
-  --set clusterName=production-cluster \
+  --set clusterName=manufacturing-cluster \
   --set serviceAccount.create=false \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set image.repository=602401143452.dkr.ecr.ap-south-1.amazonaws.com/amazon/aws-load-balancer-controller \
@@ -77,7 +77,7 @@ aws iam create-policy \
 eksctl create iamserviceaccount \
   --name external-dns \
   --namespace kube-system \
-  --cluster production-cluster  \
+  --cluster manufacturing-cluster  \
   --attach-policy-arn arn:aws:iam::$ACCOUNT_ID:policy/Route53ExternalDNSIAMPolicy \
   --approve
 ```

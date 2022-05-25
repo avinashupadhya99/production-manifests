@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   name:  package-service
   labels:
-    component: production
+    component: manufacturing
     tags.datadoghq.com/service: package-service
-    tags.datadoghq.com/env: pc-dev
+    tags.datadoghq.com/env: man-hotfix
     tags.datadoghq.com/version: "0.1.2"
 spec:
   replicas: 1
@@ -21,9 +21,9 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: package-service
-        component: production
+        component: manufacturing
         tags.datadoghq.com/service: package-service
-        tags.datadoghq.com/env: pc-dev
+        tags.datadoghq.com/env: man-hotfix
         tags.datadoghq.com/version: "0.1.2"
     spec:
       serviceAccountName: datadog-agent
@@ -51,31 +51,31 @@ spec:
         - name:  DATABASE_HOST
           valueFrom:
             secretKeyRef:
-              name: production-database
+              name: manufacturing-database
               key: host
               optional: false
         - name:  DATABASE_NAME
           valueFrom:
             secretKeyRef:
-              name: production-database
+              name: manufacturing-database
               key: name
               optional: false
         - name:  DATABASE_PORT
           valueFrom:
             secretKeyRef:
-              name: production-database
+              name: manufacturing-database
               key: port
               optional: false
         - name:  DATABASE_USER
           valueFrom:
             secretKeyRef:
-              name: production-database
+              name: manufacturing-database
               key: user
               optional: false
         - name:  DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: production-database
+              name: manufacturing-database
               key: password
               optional: false
         - name: ORDER_SERVICE_URL
